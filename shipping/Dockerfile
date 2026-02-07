@@ -1,26 +1,25 @@
-FROM debian:10 AS build
-
-RUN apt-get update && \
-apt-get install -y --no-install-recommends \
-    ca-certificates \
-    maven \
-    openjdk-8-jdk-headless \
-    wget \
-    git \
-    unzip && \
-apt-get clean && \
-rm -rf /var/lib/apt/lists/*
-
+# Build stage: Maven + JDK included
+FROM maven:3.9.3-eclipse-temurin-8 AS build
 WORKDIR /opt/shipping
-COPY pom.xml /opt/shipping/
+
+# Copy only pom.xml first for caching dependencies
+COPY pom.xml .
 RUN mvn dependency:resolve
-COPY src /opt/shipping/src/
+
+# Copy source and build
+COPY src ./src
 RUN mvn package
 
-FROM eclipse-temurin:8-jdk
+# Runtime stage: lightweight JDK only
+FROM eclipse-temurin:8-jdk-alpine
 WORKDIR /opt/shipping
 
+# Environment variables
 ENV CART_ENDPOINT=cart:8080
 ENV DB_HOST=mysql
+
+# Copy the built JAR
 COPY --from=build /opt/shipping/target/shipping-1.0.jar shipping.jar
-CMD [ "java", "-Xmn256m", "-Xmx768m", "-jar", "shipping.jar" ]
+
+# Run the service
+CMD ["java", "-Xmn256m", "-Xmx768m", "-jar", "shipping.jar"]
