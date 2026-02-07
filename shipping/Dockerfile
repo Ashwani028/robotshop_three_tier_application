@@ -14,7 +14,7 @@ RUN mvn dependency:resolve
 COPY src /opt/shipping/src/
 RUN mvn package
 
-FROM openjdk:8-jdk-slim
+FROM eclipse-temurin:8-jdk
 WORKDIR /opt/shipping
 
 ENV CART_ENDPOINT=cart:8080
