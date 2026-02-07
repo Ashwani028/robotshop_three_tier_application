@@ -14,7 +14,7 @@ RUN mvn dependency:resolve
 COPY src /opt/shipping/src/
 RUN mvn package
 
-FROM openjdk:8-jdk
+FROM FROM openjdk:8-jdk-slim
 WORKDIR /opt/shipping
 
 ENV CART_ENDPOINT=cart:8080
