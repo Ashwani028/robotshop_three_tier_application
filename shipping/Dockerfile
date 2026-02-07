@@ -1,12 +1,15 @@
 FROM debian:10 AS build
 
 RUN apt-get update && \
-    apt-get install -y --no-install-recommends \
-        ca-certificates-java \
-        maven && \
-    apt-get clean && \
-    rm -rf /var/lib/apt/lists/* && \
-    update-ca-certificates -f
+apt-get install -y --no-install-recommends \
+    ca-certificates \
+    maven \
+    openjdk-8-jdk-headless \
+    wget \
+    git \
+    unzip && \
+apt-get clean && \
+rm -rf /var/lib/apt/lists/*
 
 WORKDIR /opt/shipping
 COPY pom.xml /opt/shipping/
